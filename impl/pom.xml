@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+		<groupId>com.jshop</groupId>
+		<artifactId>jshop-ms-users</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
+	
+	<artifactId>jshop-ms-users-impl</artifactId>
+	<name>${project.artifactId}</name>
+	<packaging>jar</packaging>
+	
+    <properties>
+    		<docker.ns>jshop</docker.ns>
+        <docker-base.version>1.0.0</docker-base.version>
+        <jshop-tools-ecs-maven-plugin.version>1.0.2</jshop-tools-ecs-maven-plugin.version>
+    </properties>	
+	
+	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>jshop-ms-users-api-int</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>jshop-ms-users-rest</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+        <dependency>
+            <groupId>com.jshop</groupId>
+            <artifactId>ms-lib-rest</artifactId>
+        </dependency>
+        <dependency>
+			<groupId>com.jshop</groupId>
+			<artifactId>ms-lib-app</artifactId>
+        </dependency>
+        <dependency>
+			<groupId>com.jshop</groupId>
+			<artifactId>ms-lib-core</artifactId>
+        </dependency>
+	</dependencies>
+
+   <build>
+        <plugins>
+
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            			             
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <configuration>
+                		<serverId>docker-hub</serverId>
+                		<baseImage>${docker.ns}/base:${docker-base.version}</baseImage>
+                    <imageName>${docker.ns}/jshop-ms-users</imageName>
+					<imageTags>
+						<imageTag>${project.version}</imageTag>
+					</imageTags> 
+					<entryPoint>["/opt/docker/startup.sh"]</entryPoint>
+					<cmd>["/${project.build.finalName}.jar"]</cmd>
+					<resources>
+						<resource>
+							<targetPath>/</targetPath>
+							<directory>${project.build.directory}</directory>
+							<include>${project.build.finalName}.jar</include>
+						</resource>
+					</resources>	
+                </configuration>
+            </plugin>            
+
+        </plugins>
+    </build>
+
+</project>
